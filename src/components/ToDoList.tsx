@@ -1,27 +1,35 @@
 import React, { useState } from "react";
 import {useForm} from "react-hook-form";
 import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { toDoState } from "./atoms";
+import { Categories, categoryState, toDoSelector, toDoState } from "./atoms";
 import CreateToDo from "./CreateToDo";
 import ToDo from "./ToDo";
 
 
 function ToDoList(){
     // const [toDos, setToDos] = useRecoilState(toDoState);
-    const toDos = useRecoilValue(toDoState); // 값을 불러옴
+    // const toDos = useRecoilValue(toDoState); // 값을 불러옴
     // const modFn = useSetRecoilState(toDoState); // 값을 바꿈
+
+    const toDos = useRecoilValue(toDoSelector);
+    const [category, setCategory] = useRecoilState(categoryState);
+    const onInput = (event:React.FormEvent<HTMLSelectElement>) => {
+        setCategory(event.currentTarget.value as any);
+    }
 
     return (
         <div>
             <h1>To Dos</h1>
             <hr />
+            <select value={category} onInput={onInput}>
+                <option value={Categories.TO_DO}>To Do</option>
+                <option value={Categories.DOING}>Doing</option>
+                <option value={Categories.DONE}>Done</option>
+            </select>
             <CreateToDo />
+            <h2>{category}</h2>
+            {toDos?.map((toDo) => <ToDo key={toDo.id} {...toDo} />)}
 
-            <ul>
-                {toDos.map(toDo => 
-                   <ToDo key={toDo.id} {...toDo} />
-                )} 
-            </ul>
         </div>
     );
 }
